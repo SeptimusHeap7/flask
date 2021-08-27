@@ -31,9 +31,24 @@ def home():
     return render_template('Index.html')
 
 
-@app.route('/view')
+@app.route('/view', methods=['POST', 'GET'])
 def view():
+    print("view(): ", request)
     return render_template('view.html', values=users.query.all())
+
+
+@app.route('/delete', methods=['POST'])
+def delete():
+    print("delete(): ", request)
+    #extract selected user from the request
+    selected_user = request.form['option']
+    if selected_user == '':
+        flash('please select a user')
+    else:
+        s_user = users.query.filter_by(name=selected_user).first()
+        db.session.delete(s_user)
+        db.session.commit()
+    return redirect(url_for('view'))
 
 
 @app.route('/login', methods=['POST', 'GET'])
